@@ -23,3 +23,6 @@ Defines all primary keys, foreign keys, and constraints (NOT NULL, UNIQUE, DEFAU
 Seeds the database with realistic sample data: 2 Organisers, 2 Participants, 3 Events, 5 Categories, 4 Enrolments, and 2 Results.
 
 **CI Screenshot:** ![CI Success](Docs/CI-Success.png) 
+
+**Youtube Link:**
+https://youtu.be/C8BJRqQNRoI
