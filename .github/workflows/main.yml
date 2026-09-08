@@ -18,14 +18,14 @@ jobs:
       - name: Check /Docs folder exists
         run: |
           if [ ! -d "Docs" ]; then
-            echo "::error::/docs folder is missing"
+            echo "::error::/Docs folder is missing"
             exit 1
           fi
           echo "/Docs folder found"
 
       - name: Check required Part 1 files exist
         run: |
-          required_files=("Docs/ERD Final.png" "Docs/API Endpoint Plan.md" "Docs/RaceDay.sql")
+          required_files=("Docs/ERD Final Diagram.png" "Docs/API Endpoint Plan 6.md" "Docs/RaceDay.sql")
           missing=0
           for f in "${required_files[@]}"; do
             if [ ! -f "$f" ]; then
@@ -49,11 +49,11 @@ jobs:
 
       - name: Basic SQL script sanity check
         run: |
-          if ! grep -qi "CREATE TABLE" Docs/RaceDay.sql; then
-            echo "::error::database.sql does not appear to contain any CREATE TABLE statements"
+          if ! grep -qi "CREATE TABLE" "Docs/RaceDay.sql"; then
+            echo "::error::RaceDay.sql does not appear to contain any CREATE TABLE statements"
             exit 1
           fi
-          echo "database.sql contains CREATE TABLE statements"
+          echo "RaceDay.sql contains CREATE TABLE statements"
 
       - name: Structure validation passed
         run: echo "All required Part 1 files and folders are present."
