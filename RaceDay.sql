@@ -55,4 +55,15 @@ INSERT INTO Users(FullName,Email,PasswordHash,RoleId)VALUES
 ('Nompumelelo Zwane','zwanenoms@gmail.com','HASH_PLACEHOLDER_3',2),--Participant--
 ('Bohlale Lukhele','lukhele.bo@raceday.co.za','HASH_PLACEHOLDER_4',2);--Participant--
 
+INSERT INTO Events(EventName,EventDate,Location,Description,OrganiserId)VALUES
+('Johannesburg City Run','2026-10-18','Johannesburg, Gauteng','Annual Road Running Event in JHB CBD',1),
+('Durban Beachfront Cycle Tour','2026-11-08','Durban,KwaZulu-Natal','Scenic cycling tour in Durban beachfront.',1),
+('Cape Town Marathon','2026-12-15','Cape Town,Western Cape','The Cape Town features a gruelling 42KM marathon.',2);
+
+INSERT INTO Categories (EventId, CategoryName, DistanceKm, MaxParticipants, EntryFee) VALUES
+(1, '5km Fun Run', 5.00, 500, 100.00),
+(1, '10km Road Race', 10.00, 300, 150.00),
+(2, '21km Half Cycle', 21.00, 200, 250.00),
+(2, '42km Full Cycle', 42.00, 150, 350.00),
+(3, '10km Charity Walk', 10.00, 400, 80.00);
 
