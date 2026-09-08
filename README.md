@@ -21,3 +21,5 @@ See docs/RaceDay.sql. The script:
 Creates the RaceDayDB database and all six tables matching the ERD exactly.
 Defines all primary keys, foreign keys, and constraints (NOT NULL, UNIQUE, DEFAULT).
 Seeds the database with realistic sample data: 2 Organisers, 2 Participants, 3 Events, 5 Categories, 4 Enrolments, and 2 Results.
+
+**CI Screenshot:** ![CI Success](Docs/CI-Success.png) 
