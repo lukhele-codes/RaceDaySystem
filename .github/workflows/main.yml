@@ -15,17 +15,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check /docs folder exists
+      - name: Check /Docs folder exists
         run: |
           if [ ! -d "docs" ]; then
             echo "::error::/docs folder is missing"
             exit 1
           fi
-          echo "/docs folder found"
+          echo "/Docs folder found"
 
       - name: Check required Part 1 files exist
         run: |
-          required_files=("docs/erd.png" "docs/api-endpoint-plan.md" "docs/database.sql")
+          required_files=("Docs/ERD Final.png" "Docs/API Endpoint Plan.md" "Docs/RaceDay.sql")
           missing=0
           for f in "${required_files[@]}"; do
             if [ ! -f "$f" ]; then
@@ -49,7 +49,7 @@ jobs:
 
       - name: Basic SQL script sanity check
         run: |
-          if ! grep -qi "CREATE TABLE" docs/database.sql; then
+          if ! grep -qi "CREATE TABLE" Docs/RaceDay.sql; then
             echo "::error::database.sql does not appear to contain any CREATE TABLE statements"
             exit 1
           fi
