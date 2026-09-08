@@ -45,3 +45,14 @@ CapturedByUserId INT NOT NULL,
 CapturedAt DATETIME NOT NULL DEFAULT GETDATE(),
 FOREIGN KEY(EnrolmentId) REFERENCES Enrolments(EnrolmentId),
 FOREIGN KEY(CapturedByUserId) REFERENCES Users(UserId));
+
+--Tests--
+INSERT INTO Roles(RoleName) VALUES('Organiser'),('Participant');
+
+INSERT INTO Users(FullName,Email,PasswordHash,RoleId)VALUES
+('Bohlale Lukhele','lukhele.bo@raceday.co.za','HASH_PLACEHOLDER_1',1),--Organiser--
+('Mlando Lukhele','lukhele.mlando@raceday.co.za','HASH_PLACEHOLDER_2',1),--Organiser--
+('Nompumelelo Zwane','zwanenoms@gmail.com','HASH_PLACEHOLDER_3',2),--Participant--
+('Bohlale Lukhele','lukhele.bo@raceday.co.za','HASH_PLACEHOLDER_4',2);--Participant--
+
+
