@@ -28,3 +28,20 @@ DistanceKm DECIMAL(5,2) NOT NULL,
 MaxParticipants INT NOT NULL DEFAULT 100,
 EntryFee DECIMAL(8,2) NOT NULL DEFAULT 0,
 FOREIGN KEY(EventId) REFERENCES Events(EventId));
+
+CREATE TABLE Enrolments(EnrolmentId INT IDENTITY(1,1) PRIMARY KEY,
+ParticipantId INT NOT NULL,
+CategoryId INT NOT NULL,
+EnrolmentDate DATETIME NOT NULL DEFAULT GETDATE(),
+Status VARCHAR(20) NOT NULL DEFAULT'Confirmed'
+FOREIGN KEY(ParticipantId) REFERENCES Users(UserId),
+FOREIGN KEY(CategoryId) REFERENCES Categories(CategoryId));
+
+CREATE TABLE Results(ResultId INT IDENTITY(1,1) PRIMARY KEY,
+EnrolmentId INT NOT NULL UNIQUE,
+FinshTime TIME NULL,
+Position INT NULL,
+CapturedByUserId INT NOT NULL,
+CapturedAt DATETIME NOT NULL DEFAULT GETDATE(),
+FOREIGN KEY(EnrolmentId) REFERENCES Enrolments(EnrolmentId),
+FOREIGN KEY(CapturedByUserId) REFERENCES Users(UserId));
