@@ -17,7 +17,7 @@ jobs:
 
       - name: Check /Docs folder exists
         run: |
-          if [ ! -d "docs" ]; then
+          if [ ! -d "Docs" ]; then
             echo "::error::/docs folder is missing"
             exit 1
           fi
