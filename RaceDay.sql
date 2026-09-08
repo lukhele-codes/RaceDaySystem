@@ -53,7 +53,7 @@ INSERT INTO Users(FullName,Email,PasswordHash,RoleId)VALUES
 ('Bohlale Lukhele','lukhele.bo@raceday.co.za','HASH_PLACEHOLDER_1',1),--Organiser--
 ('Mlando Lukhele','lukhele.mlando@raceday.co.za','HASH_PLACEHOLDER_2',1),--Organiser--
 ('Nompumelelo Zwane','zwanenoms@gmail.com','HASH_PLACEHOLDER_3',2),--Participant--
-('Bohlale Lukhele','lukhele.bo@raceday.co.za','HASH_PLACEHOLDER_4',2);--Participant--
+('Zane Koost','koost@gmail.com','HASH_PLACEHOLDER_4',2);--Participant--
 
 INSERT INTO Events(EventName,EventDate,Location,Description,OrganiserId)VALUES
 ('Johannesburg City Run','2026-10-18','Johannesburg, Gauteng','Annual Road Running Event in JHB CBD',1),
@@ -67,3 +67,12 @@ INSERT INTO Categories (EventId, CategoryName, DistanceKm, MaxParticipants, Entr
 (2, '42km Full Cycle', 42.00, 150, 350.00),
 (3, '10km Charity Walk', 10.00, 400, 80.00);
 
+INSERT INTO Enrolments(ParticipantId,CategoryId,Status) VALUES
+(3, 1, 'Confirmed'), -- Bohlale -> 5km Fun Run
+(3, 3, 'Confirmed'), -- Mlando -> 21km Half Cycle
+(4, 2, 'Confirmed'), -- Nompumelelo -> 10km Road Race
+(4, 5, 'Confirmed'); -- Zane -> 10km Charity Walk
+
+INSERT INTO Results(EnrolmentId,FinshTime,Position,CapturedByUserId) VALUES
+(1,'28:34',12,1),
+(3,'58:55',15,1);
