@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Data;
 using RaceDay.Api.DTOs;
+using System.Security.Claims;
 using RaceDay.Api.Models;
 
 namespace RaceDay.Api.Controllers;
@@ -68,12 +69,19 @@ public class EventsController : ControllerBase
     [Authorize(Roles = "Admin,Organiser")]
     public async Task<ActionResult<EventDto>> CreateEvent(EventWriteDto dto)
     {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                          ?? User.FindFirstValue("sub");
+
+        if (!int.TryParse(userIdClaim, out var userId))
+            return Unauthorized("User id not found in token.");
+
         var e = new Event
         {
             EventName = dto.Name,
             Description = dto.Description,
             EventDate = dto.EventDate,
-            Location = dto.Location
+            Location = dto.Location,
+            OrganiserId = userId
         };
 
         _context.Events.Add(e);
