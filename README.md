@@ -115,10 +115,10 @@ Results
 
 The tests are written with xUnit. Unit tests check the enrolment, category and result rules. Integration tests start the API and check registration, login, requests without a token, role rejection and event management. Both success and failure cases are tested, and all tests pass locally and in GitHub Actions.
 
-![Tests passing](Docs/Screenshots/placeholder
+![Tests passing](Docs/Screenshots/placeholder)
 
 ## CI/CD
 
 A GitHub Actions workflow runs on every push. It builds the project and runs all the tests.
 
-![Successful green build](Docs/Screenshots/ci_success.png)
+![Successful green build](Docs/Screenshots/ciworkflow.png)
