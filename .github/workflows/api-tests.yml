@@ -19,13 +19,18 @@ jobs:
         with:
           dotnet-version: '8.0.x'      # adjust: match your TargetFramework
 
+      - name: Find the solution file
+        id: sln
+        run: |
+          SLN=$(find . -name '*.sln' | head -n 1)
+          echo "Found solution: $SLN"
+          echo "path=$SLN" >> "$GITHUB_OUTPUT"
+
       - name: Restore packages
-        run: dotnet restore
-        
+        run: dotnet restore "${{ steps.sln.outputs.path }}"
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
-      
+        run: dotnet build "${{ steps.sln.outputs.path }}" --no-restore --configuration Release
 
       - name: Run unit tests
-        run: dotnet test --no-build --configuration Release --verbosity normal
+        run: dotnet test "${{ steps.sln.outputs.path }}" --no-build --configuration Release --verbosity normal
