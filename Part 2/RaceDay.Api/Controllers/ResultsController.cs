@@ -117,6 +117,29 @@ public class ResultsController : ControllerBase
         return NoContent();
     }
 
+    // GET api/results/mine - the logged-in participant's own results
+    [HttpGet("results/mine")]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<ResultDto>>> GetMine()
+    {
+        var userId = CurrentUserId();
+        var list = await _db.Results
+            .Where(r => r.Enrolment.ParticipantId == userId)
+            .OrderByDescending(r => r.CapturedAt)
+            .Select(r => new ResultDto
+            {
+                Id = r.ResultId,
+                EnrolmentId = r.EnrolmentId,
+                ParticipantId = r.Enrolment.ParticipantId,
+                CategoryId = r.Enrolment.CategoryId,
+                CategoryName = r.Enrolment.Category.CategoryName,
+                FinishTime = r.FinishTime,
+                Position = r.Position,
+                CapturedAt = r.CapturedAt
+            }).ToListAsync();
+        return Ok(list);
+    }
+
     private static string? Validate(ResultWriteDto dto)
     {
         if (dto.FinishTime == null && dto.Position == null)

@@ -19,6 +19,8 @@ public class EnrolmentsController : ControllerBase
 
     // GET api/enrolments/mine - the logged-in user's enrolments
     [HttpGet("mine")]
+
+    [Authorize(Roles = "Participant")]
     public async Task<ActionResult<IEnumerable<EnrolmentDto>>> GetMine()
     {
         var userId = CurrentUserId();
@@ -38,8 +40,39 @@ public class EnrolmentsController : ControllerBase
         return Ok(list);
     }
 
+    // GET api/events/5/enrolments - owning Organiser or Admin
+    [HttpGet("~/api/events/{eventId}/enrolments")]
+    [Authorize(Roles = "Organiser,Admin")]
+    public async Task<ActionResult<IEnumerable<EventEnrolmentDto>>> GetForEvent(int eventId)
+    {
+        var ev = await _db.Events.FindAsync(eventId);
+        if (ev == null) return NotFound("Event not found.");
+        if (!User.IsInRole("Admin") && ev.OrganiserId != CurrentUserId())
+            return Forbid();
+
+        var list = await _db.Enrolments
+            .Where(e => e.Category.EventId == eventId)
+            .OrderBy(e => e.Category.CategoryName)
+            .ThenBy(e => e.EnrolmentDate)
+            .Select(e => new EventEnrolmentDto
+            {
+                Id = e.EnrolmentId,
+                EventId = eventId,
+                CategoryId = e.CategoryId,
+                CategoryName = e.Category.CategoryName,
+                ParticipantId = e.ParticipantId,
+                ParticipantName = e.Participant.FullName,
+                ParticipantEmail = e.Participant.Email,
+                EnrolmentDate = e.EnrolmentDate,
+                Status = e.Status
+            }).ToListAsync();
+
+        return Ok(list);
+    }
+
     // POST api/enrolments - body: { "categoryId": 1 }
     [HttpPost]
+    [Authorize(Roles = "Participant")]
     public async Task<ActionResult<EnrolmentDto>> Enrol(EnrolmentWriteDto dto)
     {
         var userId = CurrentUserId();

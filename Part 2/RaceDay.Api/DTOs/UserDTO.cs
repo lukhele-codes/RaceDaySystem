@@ -18,4 +18,5 @@ public class UserUpdateDto
 
     [Required, EmailAddress, MaxLength(255)]
     public string Email { get; set; } = string.Empty;
+    public string Role { get; set; } = "Participant";
 }
