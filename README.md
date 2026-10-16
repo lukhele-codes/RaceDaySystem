@@ -34,7 +34,7 @@ The RaceDay API is built with ASP.NET Core Web API in C# and uses SQL Server thr
 YouTube video: 
 
 Steps:
-1. Clone the repository: 
+1. Clone the repository: https://github.com/lukhele-codes/RaceDaySystem
 2. Open the solution file in the Part 2 folder in Visual Studio.
 3. Open appsettings.json in the RaceDay.Api project and set the database connection string to your own SQL Server. 
 4. Check the JWT settings in appsettings.json. FILL IN HOW THE SIGNING KEY IS SET.
