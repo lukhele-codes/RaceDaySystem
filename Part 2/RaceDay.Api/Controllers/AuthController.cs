@@ -22,10 +22,20 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(Register dto)
     {
+
         if (await _db.Users.AnyAsync(u => u.Email == dto.Email))
             return Conflict("That email is already registered.");
 
-        var role = await _db.Roles.FirstAsync(r => r.RoleName == "Participant");
+        // Only Organiser or Participant can be chosen at registration - never Admin
+        var allowed = new[] { "Organiser", "Participant" };
+        var requestedRole = allowed.FirstOrDefault(r =>
+            r.Equals(dto.Role?.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (requestedRole == null)
+            return BadRequest("Role must be either Organiser or Participant.");
+
+        var role = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == requestedRole);
+        if (role == null)
+            return BadRequest("That role does not exist.");
 
         var user = new User
         {
@@ -74,4 +84,6 @@ public class AuthController : ControllerBase
         Email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value,
         Role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
     });
+
+    public string Role { get; set; } = "Participant";
 }
