@@ -31,7 +31,7 @@ https://youtu.be/C8BJRqQNRoI
 
 The RaceDay API is built with ASP.NET Core Web API in C# and uses SQL Server through Entity Framework Core with the code first approach. It handles registration, login, events, categories, enrolments and results, with different access for Organisers and Participants.
 
-YouTube video: 
+YouTube video: https://youtu.be/KcHu7c_NCFc
 
 Steps:
 1. Clone the repository: https://github.com/lukhele-codes/RaceDaySystem
