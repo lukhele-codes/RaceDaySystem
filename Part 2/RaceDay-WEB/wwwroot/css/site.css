@@ -1,0 +1,147 @@
+:root {
+    --rd-navy: #0B1F3A;
+    --rd-orange: #FF6B1A;
+    --rd-orange-dark: #E55A0F;
+    --rd-bg: #F5F7FA;
+    --rd-green: #1E9E5A;
+    --rd-amber: #F5A623;
+    --rd-red: #D64045;
+}
+
+html {
+    font-size: 15px;
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--rd-bg);
+    color: #1c2733;
+    margin-bottom: 60px;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 800;
+    color: var(--rd-navy);
+}
+
+/* Navbar */
+.rd-navbar {
+    background-color: var(--rd-navy);
+    border-bottom: 4px solid var(--rd-orange);
+}
+
+    .rd-navbar .navbar-brand {
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #fff;
+    }
+
+        .rd-navbar .navbar-brand span {
+            color: var(--rd-orange);
+        }
+
+    .rd-navbar .nav-link {
+        color: #dbe4f0;
+        font-weight: 600;
+    }
+
+        .rd-navbar .nav-link:hover {
+            color: var(--rd-orange);
+        }
+
+/* Buttons */
+.btn-rd {
+    background-color: var(--rd-orange);
+    border-color: var(--rd-orange);
+    color: #fff;
+    font-weight: 600;
+}
+
+    .btn-rd:hover {
+        background-color: var(--rd-orange-dark);
+        border-color: var(--rd-orange-dark);
+        color: #fff;
+    }
+
+.btn-rd-outline {
+    border: 2px solid var(--rd-navy);
+    color: var(--rd-navy);
+    font-weight: 600;
+}
+
+    .btn-rd-outline:hover {
+        background-color: var(--rd-navy);
+        color: #fff;
+    }
+
+/* Cards */
+.rd-card {
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(11, 31, 58, 0.08);
+}
+
+    .rd-card .card-header {
+        background: var(--rd-navy);
+        color: #fff;
+        font-weight: 600;
+        border-radius: 12px 12px 0 0;
+    }
+
+/* Hero banner */
+.rd-hero {
+    background: linear-gradient(135deg, var(--rd-navy), #16365f);
+    color: #fff;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+}
+
+    .rd-hero h1 {
+        color: #fff;
+    }
+
+    .rd-hero .accent {
+        color: var(--rd-orange);
+    }
+
+/* Enrolment status badges */
+.status-badge {
+    padding: 0.35em 0.8em;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.status-confirmed {
+    background-color: var(--rd-green);
+}
+
+.status-pending {
+    background-color: var(--rd-amber);
+    color: #1c2733;
+}
+
+.status-cancelled {
+    background-color: var(--rd-red);
+}
+
+/* Tables */
+.table thead {
+    background-color: var(--rd-navy);
+    color: #fff;
+}
+
+/* Footer */
+.rd-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    line-height: 50px;
+    background: var(--rd-navy);
+    color: #9fb0c8;
+    text-align: center;
+}
