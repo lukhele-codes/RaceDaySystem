@@ -1,0 +1,33 @@
+﻿@model List<RaceDay_WEB.Models.EventDto>
+@{
+    var target = (string)ViewBag.Target;
+    ViewData["Title"] = "Choose an event";
+}
+
+<h2 class="mb-3"><i class="bi bi-list-check"></i> Choose an event</h2>
+<p class="text-muted">Select the event you want to view <strong>@target.ToLower()</strong> for.</p>
+
+@if (!Model.Any())
+{
+    <div class="card rd-card p-4 text-center">
+        <p class="mb-3">You have no events yet.</p>
+        <div><a class="btn btn-rd" asp-action="CreateEvent">Create your first event</a></div>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var e in Model)
+        {
+            <div class="col-md-6">
+                <div class="card rd-card p-3 h-100">
+                    <h5 class="mb-1">@e.Name</h5>
+                    <p class="text-muted mb-3">@e.EventDate.ToString("dd MMM yyyy") &middot; @e.Location</p>
+                    <div class="mt-auto">
+                        <a class="btn btn-rd" asp-action="@target" asp-route-eventId="@e.Id">Open @target</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

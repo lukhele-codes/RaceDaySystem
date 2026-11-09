@@ -1,0 +1,68 @@
+﻿@model List<RaceDay_WEB.Models.EventEnrolmentDto>
+@{
+    var ev = (RaceDay_WEB.Models.EventDto)ViewBag.Event;
+    ViewData["Title"] = "Enrolments";
+
+    string StatusClass(string? status)
+    {
+        var s = (status ?? "").ToLower();
+        if (s.Contains("confirm")) return "status-confirmed";
+        if (s.Contains("pend")) return "status-pending";
+        if (s.Contains("cancel")) return "status-cancelled";
+        return "bg-secondary";
+    }
+
+    var confirmed = Model.Count(x => (x.Status ?? "").ToLower().Contains("confirm"));
+    var pending = Model.Count(x => (x.Status ?? "").ToLower().Contains("pend"));
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-people"></i> Enrolments</h2>
+        <span class="text-muted">@ev.Name &middot; @ev.EventDate.ToString("dd MMM yyyy")</span>
+    </div>
+    <a class="btn btn-rd-outline" asp-action="Events">Back to events</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card rd-card p-3 text-center"><h2 class="mb-0">@Model.Count</h2><span>Total enrolments</span></div></div>
+    <div class="col-md-4"><div class="card rd-card p-3 text-center"><h2 class="mb-0">@confirmed</h2><span>Confirmed</span></div></div>
+    <div class="col-md-4"><div class="card rd-card p-3 text-center"><h2 class="mb-0">@pending</h2><span>Pending</span></div></div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card rd-card p-4 text-center">
+        <p class="mb-0">Nobody has entered this event yet.</p>
+    </div>
+}
+else
+{
+    <div class="card rd-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Email</th>
+                        <th>Category</th>
+                        <th>Enrolled on</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var en in Model)
+                    {
+                        <tr>
+                            <td><strong>@en.ParticipantName</strong></td>
+                            <td>@en.ParticipantEmail</td>
+                            <td>@en.CategoryName</td>
+                            <td>@en.EnrolmentDate.ToString("dd MMM yyyy")</td>
+                            <td><span class="status-badge @StatusClass(en.Status)">@en.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
