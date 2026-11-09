@@ -16,9 +16,35 @@ namespace RaceDay_WEB.Controllers
             _api = api;
         }
 
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
-            return View();
+            var result = await _api.GetAsync<List<EventDto>>("api/Events");
+            if (result.StatusCode == HttpStatusCode.Unauthorized) return ExpiredSession();
+            if (!result.Success) TempData["FlashError"] = result.Error;
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var events = (result.Data ?? new List<EventDto>())
+                .Where(e => e.OrganiserId == userId)
+                .OrderBy(e => e.EventDate)
+                .ToList();
+
+            var enrolments = new List<EventEnrolmentDto>();
+            foreach (var e in events)
+            {
+                var er = await _api.GetAsync<List<EventEnrolmentDto>>($"api/events/{e.Id}/enrolments");
+                if (er.Success && er.Data != null) enrolments.AddRange(er.Data);
+            }
+
+            var model = new DashboardViewModel
+            {
+                TotalEvents = events.Count,
+                UpcomingEvents = events.Count(e => e.EventDate >= DateTime.Now),
+                TotalEnrolments = enrolments.Count,
+                ConfirmedEnrolments = enrolments.Count(x => (x.Status ?? "").ToLower().Contains("confirm")),
+                PendingEnrolments = enrolments.Count(x => (x.Status ?? "").ToLower().Contains("pend")),
+                NextEvents = events.Where(e => e.EventDate >= DateTime.Now).Take(3).ToList()
+            };
+            return View(model);
         }
 
         // ---------- Events ----------
@@ -277,6 +303,145 @@ namespace RaceDay_WEB.Controllers
 
             ViewBag.Event = ev;
             return View(result.Data ?? new List<EventEnrolmentDto>());
+        }
+
+        // ---------- Results ----------
+
+        public async Task<IActionResult> Results(int eventId, int? categoryId)
+        {
+            var ev = await GetOwnedEventAsync(eventId);
+            if (ev == null) return RedirectToAction("Events");
+
+            var catResult = await _api.GetAsync<List<CategoryDto>>($"api/events/{eventId}/categories");
+            if (catResult.StatusCode == HttpStatusCode.Unauthorized) return ExpiredSession();
+            if (!catResult.Success) TempData["FlashError"] = catResult.Error;
+
+            var categories = catResult.Data ?? new List<CategoryDto>();
+            var selected = categories.FirstOrDefault(c => c.Id == categoryId) ?? categories.FirstOrDefault();
+
+            var rows = new List<ResultRowViewModel>();
+            if (selected != null)
+            {
+                var enrolResult = await _api.GetAsync<List<EventEnrolmentDto>>($"api/events/{eventId}/enrolments");
+                var resResult = await _api.GetAsync<List<ResultDto>>($"api/categories/{selected.Id}/results");
+                if (enrolResult.StatusCode == HttpStatusCode.Unauthorized) return ExpiredSession();
+                if (!enrolResult.Success) TempData["FlashError"] = enrolResult.Error;
+
+                var results = resResult.Data ?? new List<ResultDto>();
+                rows = (enrolResult.Data ?? new List<EventEnrolmentDto>())
+                    .Where(e => e.CategoryId == selected.Id)
+                    .Select(e => new ResultRowViewModel
+                    {
+                        Enrolment = e,
+                        Result = results.FirstOrDefault(r => r.EnrolmentId == e.Id)
+                    })
+                    .OrderBy(r => r.Result?.Position ?? int.MaxValue)
+                    .ThenBy(r => r.Enrolment.ParticipantName)
+                    .ToList();
+            }
+
+            ViewBag.Event = ev;
+            ViewBag.Categories = categories;
+            ViewBag.Selected = selected;
+            return View(rows);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CaptureResult(int eventId, int enrolmentId, int? resultId)
+        {
+            var ev = await GetOwnedEventAsync(eventId);
+            if (ev == null) return RedirectToAction("Events");
+
+            var enrolResult = await _api.GetAsync<List<EventEnrolmentDto>>($"api/events/{eventId}/enrolments");
+            if (enrolResult.StatusCode == HttpStatusCode.Unauthorized) return ExpiredSession();
+
+            var enrolment = enrolResult.Data?.FirstOrDefault(e => e.Id == enrolmentId);
+            if (enrolment == null)
+            {
+                TempData["FlashError"] = "We could not find that enrolment.";
+                return RedirectToAction("Results", new { eventId });
+            }
+
+            var model = new ResultFormViewModel
+            {
+                EventId = eventId,
+                CategoryId = enrolment.CategoryId,
+                EnrolmentId = enrolmentId,
+                ResultId = resultId,
+                ParticipantName = enrolment.ParticipantName,
+                CategoryName = enrolment.CategoryName
+            };
+
+            if (resultId != null)
+            {
+                var resResult = await _api.GetAsync<List<ResultDto>>($"api/categories/{enrolment.CategoryId}/results");
+                var existing = resResult.Data?.FirstOrDefault(r => r.Id == resultId);
+                if (existing != null)
+                {
+                    model.Position = existing.Position;
+                    if (TimeSpan.TryParse(existing.FinishTime, out var ts))
+                        model.FinishTime = ts.ToString(@"hh\:mm\:ss");
+                }
+            }
+
+            ViewBag.Event = ev;
+            return View("ResultForm", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CaptureResult(ResultFormViewModel model)
+        {
+            var ev = await GetOwnedEventAsync(model.EventId);
+            if (ev == null) return RedirectToAction("Events");
+            ViewBag.Event = ev;
+
+            if (!ModelState.IsValid) return View("ResultForm", model);
+
+            if (string.IsNullOrWhiteSpace(model.FinishTime) && model.Position == null)
+            {
+                ModelState.AddModelError("", "Please enter a finish time, a position, or both.");
+                return View("ResultForm", model);
+            }
+
+            string? finishTime = string.IsNullOrWhiteSpace(model.FinishTime)
+                ? null
+                : TimeSpan.Parse(model.FinishTime).ToString();
+
+            ApiResult result;
+            if (model.ResultId == null)
+            {
+                result = await _api.SendAsync(HttpMethod.Post, "api/results",
+                    new { finishTime, position = model.Position, enrolmentId = model.EnrolmentId });
+            }
+            else
+            {
+                result = await _api.SendAsync(HttpMethod.Put, $"api/results/{model.ResultId}",
+                    new { finishTime, position = model.Position });
+            }
+
+            if (result.StatusCode == HttpStatusCode.Unauthorized) return ExpiredSession();
+            if (!result.Success)
+            {
+                ModelState.AddModelError("", result.Error);
+                return View("ResultForm", model);
+            }
+
+            TempData["Flash"] = "Result saved.";
+            return RedirectToAction("Results", new { eventId = model.EventId, categoryId = model.CategoryId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteResult(int eventId, int categoryId, int id)
+        {
+            var result = await _api.SendAsync(HttpMethod.Delete, $"api/results/{id}");
+            if (result.StatusCode == HttpStatusCode.Unauthorized) return ExpiredSession();
+
+            if (result.Success) TempData["Flash"] = "Result removed.";
+            else TempData["FlashError"] = result.Error;
+
+            return RedirectToAction("Results", new { eventId, categoryId });
         }
 
         // ---------- Helpers ----------
