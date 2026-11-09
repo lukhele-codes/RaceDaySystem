@@ -297,5 +297,27 @@ namespace RaceDay_WEB.Controllers
             TempData["FlashError"] = "Your session has expired. Please log in again.";
             return RedirectToAction("Login", "Account");
         }
+
+        private static object CategoryPayload(CategoryFormViewModel m) => new
+        {
+            name = m.Name,
+            distanceKm = m.DistanceKm,
+            maxParticipants = m.MaxParticipants,
+            entryFee = m.EntryFee
+        };
+
+        // Loads an event and checks it belongs to the logged-in organiser.
+        private async Task<EventDto?> GetOwnedEventAsync(int eventId)
+        {
+            var result = await _api.GetAsync<EventDto>($"api/Events/{eventId}");
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (!result.Success || result.Data == null || result.Data.OrganiserId != userId)
+            {
+                TempData["FlashError"] = "We could not find that event.";
+                return null;
+            }
+            return result.Data;
+        }
     }
 }
