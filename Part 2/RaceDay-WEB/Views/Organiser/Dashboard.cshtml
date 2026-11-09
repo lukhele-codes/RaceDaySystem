@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Organiser Dashboard";
+}
+
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Organiser Dashboard</h2>
+<p class="lead">Welcome back, @Context.Session.GetString("FullName"). Manage your events, categories, enrolments and results here.</p>
+
+<div class="row g-4 mt-1">
+    <div class="col-md-4">
+        <div class="card rd-card p-4 text-center">
+            <h1 class="mb-0">-</h1>
+            <p class="mb-0">Events</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card rd-card p-4 text-center">
+            <h1 class="mb-0">-</h1>
+            <p class="mb-0">Enrolments</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card rd-card p-4 text-center">
+            <h1 class="mb-0">-</h1>
+            <p class="mb-0">Upcoming events</p>
+        </div>
+    </div>
+</div>
