@@ -1,0 +1,102 @@
+﻿@model List<RaceDay_WEB.Models.ResultRowViewModel>
+@{
+    var ev = (RaceDay_WEB.Models.EventDto)ViewBag.Event;
+    var categories = (List<RaceDay_WEB.Models.CategoryDto>)ViewBag.Categories;
+    var selected = ViewBag.Selected as RaceDay_WEB.Models.CategoryDto;
+    ViewData["Title"] = "Results";
+
+    string StatusClass(string? status)
+    {
+        var s = (status ?? "").ToLower();
+        if (s.Contains("confirm")) return "status-confirmed";
+        if (s.Contains("pend")) return "status-pending";
+        if (s.Contains("cancel")) return "status-cancelled";
+        return "bg-secondary";
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="bi bi-trophy"></i> Results</h2>
+        <span class="text-muted">@ev.Name &middot; @ev.EventDate.ToString("dd MMM yyyy")</span>
+    </div>
+    <a class="btn btn-rd-outline" asp-action="Events">Back to events</a>
+</div>
+
+@if (!categories.Any())
+{
+    <div class="card rd-card p-4 text-center">
+        <p class="mb-3">This event has no categories yet, so there is nothing to record results for.</p>
+        <div><a class="btn btn-rd" asp-action="CreateCategory" asp-route-eventId="@ev.Id">Add a category</a></div>
+    </div>
+}
+else
+{
+    <ul class="nav nav-pills mb-3">
+        @foreach (var c in categories)
+        {
+            <li class="nav-item me-2 mb-2">
+                <a class="btn @(selected?.Id == c.Id ? "btn-rd" : "btn-rd-outline")"
+                   asp-action="Results" asp-route-eventId="@ev.Id" asp-route-categoryId="@c.Id">@c.Name</a>
+            </li>
+        }
+    </ul>
+
+    @if (!Model.Any())
+    {
+        <div class="card rd-card p-4 text-center">
+            <p class="mb-0">Nobody has enrolled in this category yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card rd-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Participant</th>
+                            <th>Status</th>
+                            <th>Finish time</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model)
+                        {
+                            <tr>
+                                <td>@(row.Result?.Position?.ToString() ?? "-")</td>
+                                <td><strong>@row.Enrolment.ParticipantName</strong><br /><small class="text-muted">@row.Enrolment.ParticipantEmail</small></td>
+                                <td><span class="status-badge @StatusClass(row.Enrolment.Status)">@row.Enrolment.Status</span></td>
+                                <td>@(row.Result?.FinishTime ?? "-")</td>
+                                <td class="text-end">
+                                    @if (row.Result == null)
+                                    {
+                                        <a class="btn btn-sm btn-rd" asp-action="CaptureResult"
+                                           asp-route-eventId="@ev.Id" asp-route-enrolmentId="@row.Enrolment.Id">
+                                            <i class="bi bi-plus-lg"></i> Enter result
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-sm btn-rd-outline" asp-action="CaptureResult"
+                                           asp-route-eventId="@ev.Id" asp-route-enrolmentId="@row.Enrolment.Id" asp-route-resultId="@row.Result.Id">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <form asp-action="DeleteResult" asp-route-eventId="@ev.Id"
+                                              asp-route-categoryId="@selected?.Id" asp-route-id="@row.Result.Id"
+                                              method="post" class="d-inline"
+                                              onsubmit="return confirm('Remove this result?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
