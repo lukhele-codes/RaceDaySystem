@@ -145,3 +145,16 @@ h1, h2, h3, h4 {
     color: #9fb0c8;
     text-align: center;
 }
+
+/* Event type badges */
+.type-run {
+    background-color: var(--rd-orange);
+}
+
+.type-walk {
+    background-color: var(--rd-green);
+}
+
+.type-cycle {
+    background-color: var(--rd-navy);
+}
