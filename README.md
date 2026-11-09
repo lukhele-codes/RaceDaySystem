@@ -122,3 +122,36 @@ The tests are written with xUnit. Unit tests check the enrolment, category and r
 A GitHub Actions workflow runs on every push. It builds the project and runs all the tests.
 
 ![Successful green build](Docs/Screenshots/ciworkflow.png)
+
+# RaceDay - Part 3 (MVC Front End)
+
+RaceDay is an event platform for running, walking and cycling events in South Africa.
+Part 3 adds an ASP.NET Core MVC front end that consumes the Part 2 API.
+
+## Video demonstration
+YouTube (unlisted): PASTE-LINK-HERE
+
+## Structure
+- `RaceDay.Api` - Part 2 Web API (SQL Server, JWT authentication)
+- `RaceDay_WEB` - Part 3 ASP.NET Core MVC app (no database access, uses the API only)
+- `.github/workflows` - GitHub Actions CI (builds API and MVC)
+
+## Features
+**Authentication and roles:** register and log in through the API, session stores user ID, role and token, role-based menus, logout clears the session, unauthenticated users are redirected to Login.
+
+**Organiser:** dashboard with live counts, events (create, edit, delete, search), categories per event, enrolments with colour-coded statuses, results entry.
+
+**Participant:** home, browse and search events, event detail with Enter Event, my events (cancel entry), my results (finish time and position), profile.
+
+**UI:** Bootstrap with a RaceDay theme. Statuses are colour coded (green Confirmed, amber Pending, red Cancelled).
+
+## Running locally
+1. Run the API (`RaceDay.Api`) and note its HTTPS URL.
+2. Set `ApiSettings:BaseUrl` in `RaceDay_WEB/appsettings.json` to that URL (no `/swagger`).
+3. In Visual Studio set both projects to start, then press F5.
+
+## CI
+![CI](ci-screenshot.png)
+
+## Docker and Azure Blob Storage
+PASTE-STATUS-HERE
