@@ -1,27 +1,61 @@
-﻿@{
+﻿@model RaceDay_WEB.Models.DashboardViewModel
+@{
     ViewData["Title"] = "Organiser Dashboard";
 }
 
-<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Organiser Dashboard</h2>
-<p class="lead">Welcome back, @Context.Session.GetString("FullName"). Manage your events, categories, enrolments and results here.</p>
+<h2 class="mb-1"><i class="bi bi-speedometer2"></i> Organiser Dashboard</h2>
+<p class="text-muted mb-4">Welcome back, @Context.Session.GetString("FullName").</p>
 
-<div class="row g-4 mt-1">
-    <div class="col-md-4">
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card rd-card p-4 text-center"><h1 class="mb-0">@Model.TotalEvents</h1><p class="mb-0">Events</p></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card rd-card p-4 text-center"><h1 class="mb-0">@Model.UpcomingEvents</h1><p class="mb-0">Upcoming</p></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card rd-card p-4 text-center"><h1 class="mb-0">@Model.TotalEnrolments</h1><p class="mb-0">Enrolments</p></div>
+    </div>
+    <div class="col-md-3">
         <div class="card rd-card p-4 text-center">
-            <h1 class="mb-0">-</h1>
-            <p class="mb-0">Events</p>
+            <h1 class="mb-0">@Model.ConfirmedEnrolments <small class="fs-6 text-muted">confirmed</small></h1>
+            <p class="mb-0"><span class="status-badge status-pending">@Model.PendingEnrolments pending</span></p>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card rd-card p-4 text-center">
-            <h1 class="mb-0">-</h1>
-            <p class="mb-0">Enrolments</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-7">
+        <div class="card rd-card">
+            <div class="card-header">Next events</div>
+            <div class="card-body">
+                @if (!Model.NextEvents.Any())
+                {
+                    <p class="mb-0">No upcoming events. <a asp-action="CreateEvent">Create one</a>.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var e in Model.NextEvents)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><strong>@e.Name</strong><br /><small class="text-muted">@e.EventDate.ToString("dd MMM yyyy, HH:mm") &middot; @e.Location</small></span>
+                                <a class="btn btn-sm btn-rd-outline" asp-action="Enrolments" asp-route-eventId="@e.Id">Enrolments</a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card rd-card p-4 text-center">
-            <h1 class="mb-0">-</h1>
-            <p class="mb-0">Upcoming events</p>
+    <div class="col-md-5">
+        <div class="card rd-card">
+            <div class="card-header">Quick actions</div>
+            <div class="card-body d-grid gap-2">
+                <a class="btn btn-rd" asp-action="CreateEvent"><i class="bi bi-plus-lg"></i> Create event</a>
+                <a class="btn btn-rd-outline" asp-action="Events"><i class="bi bi-calendar-event"></i> Manage events</a>
+                <a class="btn btn-rd-outline" asp-action="ChooseEvent" asp-route-target="Results"><i class="bi bi-trophy"></i> Enter results</a>
+            </div>
         </div>
     </div>
 </div>
