@@ -1,0 +1,40 @@
+﻿@model RaceDay_WEB.Models.ParticipantHomeViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="rd-hero text-center mb-4">
+    <h1>Welcome, <span class="accent">@Context.Session.GetString("FullName")</span></h1>
+    <p class="lead">Ready for your next finish line?</p>
+    <a class="btn btn-rd btn-lg" asp-action="Events">Browse events</a>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4"><div class="card rd-card p-4 text-center"><h1 class="mb-0">@Model.MyEnrolments</h1><p class="mb-0">My entries</p></div></div>
+    <div class="col-md-4"><div class="card rd-card p-4 text-center"><h1 class="mb-0">@Model.Confirmed</h1><p class="mb-0">Confirmed</p></div></div>
+    <div class="col-md-4"><div class="card rd-card p-4 text-center"><h1 class="mb-0">@Model.ResultsCount</h1><p class="mb-0">Results recorded</p></div></div>
+</div>
+
+<h4 class="mb-3">Coming up</h4>
+@if (!Model.Upcoming.Any())
+{
+    <div class="card rd-card p-4 text-center"><p class="mb-0">No upcoming events right now. Check back soon!</p></div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var e in Model.Upcoming)
+        {
+            <div class="col-md-4">
+                <div class="card rd-card h-100">
+                    <div class="event-banner type-@((e.EventType ?? "").ToLower())"><i class="bi @RaceDay_WEB.Models.UiHelpers.TypeIcon(e.EventType)"></i></div>
+                    <div class="card-body">
+                        <h5>@e.Name</h5>
+                        <p class="text-muted mb-2">@e.EventDate.ToString("dd MMM yyyy") &middot; @e.Location</p>
+                        <a class="btn btn-rd btn-sm" asp-action="EventDetail" asp-route-id="@e.Id">View details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

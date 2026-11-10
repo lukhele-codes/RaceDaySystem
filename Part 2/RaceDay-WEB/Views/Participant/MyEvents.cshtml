@@ -1,0 +1,66 @@
+﻿@model List<RaceDay_WEB.Models.MyEnrolmentRow>
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<h2 class="mb-4"><i class="bi bi-calendar-check"></i> My Events</h2>
+
+@if (!Model.Any())
+{
+    <div class="card rd-card p-4 text-center">
+        <p class="mb-3">You have not entered any events yet.</p>
+        <div><a class="btn btn-rd" asp-action="Events">Browse events</a></div>
+    </div>
+}
+else
+{
+    <div class="card rd-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Entered on</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        var cancelled = (r.Enrolment.Status ?? "").ToLower().Contains("cancel");
+                        var upcoming = r.Event != null && r.Event.EventDate >= DateTime.Now;
+                        <tr>
+                            <td>
+                                @if (r.Event != null)
+                                {
+                                    <a asp-action="EventDetail" asp-route-id="@r.Event.Id"><strong>@r.Event.Name</strong></a>
+                                }
+                                else
+                                {
+
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>@(r.Event?.EventDate.ToString("dd MMM yyyy, HH:mm") ?? "-")</td>
+                            <td>@r.Enrolment.CategoryName</td>
+                            <td>@r.Enrolment.EnrolmentDate.ToString("dd MMM yyyy")</td>
+                            <td><span class="status-badge @RaceDay_WEB.Models.UiHelpers.StatusClass(r.Enrolment.Status)">@r.Enrolment.Status</span></td>
+                            <td class="text-end">
+                                @if (!cancelled && upcoming)
+                                {
+                                    <form asp-action="CancelEnrolment" asp-route-id="@r.Enrolment.Id" method="post" class="d-inline"
+                                          onsubmit="return confirm('Cancel your entry?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel entry</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
