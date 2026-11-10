@@ -1,0 +1,68 @@
+﻿@model RaceDay_WEB.Models.EventDetailViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.Name;
+    var upcoming = ev.EventDate >= DateTime.Now;
+}
+
+<a class="btn btn-rd-outline btn-sm mb-3" asp-action="Events"><i class="bi bi-arrow-left"></i> Back to events</a>
+
+<div class="card rd-card mb-4">
+    @* Step 8 replaces this banner with the uploaded Azure image when one exists *@
+    <div class="event-banner type-@((ev.EventType ?? "").ToLower())"><i class="bi @RaceDay_WEB.Models.UiHelpers.TypeIcon(ev.EventType)"></i></div>
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start">
+            <h2>@ev.Name</h2>
+            <span class="status-badge type-@((ev.EventType ?? "").ToLower())">@ev.EventType</span>
+        </div>
+        <p class="mb-1"><i class="bi bi-calendar3"></i> @ev.EventDate.ToString("dddd, dd MMMM yyyy, HH:mm")</p>
+        <p class="mb-1"><i class="bi bi-geo-alt"></i> @ev.Location</p>
+        <p class="mb-3"><i class="bi bi-signpost-2"></i> @ev.DistanceKm km</p>
+        <p>@ev.Description</p>
+
+        @if (Model.MyEnrolment != null)
+        {
+            <div class="alert alert-info mb-0">
+                You are entered in <strong>@Model.MyEnrolment.CategoryName</strong>
+                <span class="status-badge @RaceDay_WEB.Models.UiHelpers.StatusClass(Model.MyEnrolment.Status) ms-2">@Model.MyEnrolment.Status</span>
+                <a class="ms-3" asp-action="MyEvents">View my events</a>
+            </div>
+        }
+    </div>
+</div>
+
+<h4 class="mb-3">Categories</h4>
+@if (!Model.Categories.Any())
+{
+    <div class="card rd-card p-4 text-center"><p class="mb-0">The organiser has not added categories yet.</p></div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var c in Model.Categories)
+        {
+            <div class="col-md-4">
+                <div class="card rd-card h-100 p-3">
+                    <h5>@c.Name</h5>
+                    <p class="mb-1">@c.DistanceKm km</p>
+                    <p class="mb-1">Entry fee: R @c.EntryFee.ToString("N2")</p>
+                    <p class="text-muted">Max @c.MaxParticipants participants</p>
+
+                    @if (Model.MyEnrolment == null && upcoming)
+                    {
+                        <form asp-action="EnterEvent" method="post" class="mt-auto"
+                              onsubmit="return confirm('Enter @c.Name for R @c.EntryFee.ToString("N2")?');">
+                            <input type="hidden" name="eventId" value="@ev.Id" />
+                            <input type="hidden" name="categoryId" value="@c.Id" />
+                            <button type="submit" class="btn btn-rd w-100"><i class="bi bi-flag"></i> Enter Event</button>
+                        </form>
+                    }
+                    else if (!upcoming)
+                    {
+                        <span class="text-muted mt-auto">This event has finished.</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
