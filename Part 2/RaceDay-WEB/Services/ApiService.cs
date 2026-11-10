@@ -155,8 +155,9 @@ namespace RaceDay_WEB.Services
 
             if (response.IsSuccessStatusCode) return (true, "");
 
-            var body = await response.Content.ReadAsStringAsync();
-            return (false, $"({(int)response.StatusCode}) {body}");
+            return (false, response.StatusCode == System.Net.HttpStatusCode.BadRequest
+                ? "Please check your details. That email may already be registered, or the password may be too weak."
+                : "We could not create your account right now. Please try again.");
         }
     }
 }
